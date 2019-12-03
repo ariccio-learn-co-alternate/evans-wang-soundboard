@@ -82,6 +82,7 @@ def populate
   sounds_repo = sounds_repo_path_str
   folders = list_folders(sounds_repo)
   folders.each do |folder|
+    puts "processing folder #{folder}"
     all_files_in_folder(sounds_repo, folder)
   end
 end
