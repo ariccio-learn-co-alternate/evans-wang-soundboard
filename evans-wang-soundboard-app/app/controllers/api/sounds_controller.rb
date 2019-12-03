@@ -21,4 +21,14 @@ class Api::SoundsController < ApplicationController
   end
 
 
+  def show
+    # sound_params = show_params
+    # byebug
+    sound = Sound.find(params[:id])
+    send_file sound.path, type: 'audio', disposition: 'inline', status: :ok 
+  end
+
+  # def show_params
+  #   params.require(:sound).permit(:sound_id)
+  # end
 end

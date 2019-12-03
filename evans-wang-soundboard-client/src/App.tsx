@@ -13,7 +13,10 @@ async function content()  {
   const parsed = await resp.json();
   console.log(parsed);
   debugger;
-  return parsed
+  const fileResp = await fetch(`api/sounds/${parsed.sounds[0].id}`, {
+    method: 'GET'
+    })
+  debugger;
 }
 
 interface AppProps {

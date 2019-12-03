@@ -73,7 +73,9 @@ def all_files_in_folder(sounds_repo_path, folder)
   this_dir_path = sounds_repo_path.join(folder)
   this_dir = Dir.new(this_dir_path)
   this_dir.children.each do |file|
-    Sound.create!(path: sounds_repo_path.join(file), sound_type: folder, mood: mood_type(folder))
+    path = this_dir_path.join(file)
+    puts "creating entry for path #{path}"
+    Sound.create!(path: path, sound_type: folder, mood: mood_type(folder))
   end
 end
 
@@ -87,4 +89,5 @@ def populate
   end
 end
 
+Sound.destroy_all
 populate
