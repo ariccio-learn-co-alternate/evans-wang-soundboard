@@ -1,26 +1,41 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const GET_PARAMS: RequestInit =  {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+  }
 }
 
-export default App;
+async function content()  {
+  const resp = await fetch('api/sounds', GET_PARAMS)
+  const parsed = await resp.json();
+  console.log(parsed);
+  debugger;
+  return parsed
+}
+
+interface AppProps {
+
+}
+
+interface AppState {
+
+}
+
+class _App extends React.Component<AppProps, AppState> {
+
+  render() {
+    content()
+    return (
+      <div className="App">
+        <p>{}</p>
+  
+      </div>
+    );
+
+  }
+}
+
+export const App = _App;
