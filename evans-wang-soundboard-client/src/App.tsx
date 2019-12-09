@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
+import { jsxAttribute } from '@babel/types';
 
 const GET_PARAMS: RequestInit =  {
   method: 'GET',
@@ -11,7 +12,8 @@ const GET_PARAMS: RequestInit =  {
 }
 
 async function content()  {
-  const resp = await fetch('api/sounds', GET_PARAMS)
+  // debugger;
+  const resp: Response = await fetch('api/sounds', GET_PARAMS)
   const parsed = await resp.json();
   console.log(parsed);
   // debugger;
@@ -77,7 +79,48 @@ function randomSoundFromArray(sounds: Array<any>): any {
   return sound;
 }
 
-const tableHeader = () =>
+const eachTR = (anAudioItem: any): JSX.Element => 
+  <>
+    <td>
+      {anAudioItem.sound_type}
+    </td>
+    <td>
+      {anAudioItem.name}
+    </td>
+  </>
+function soundsByType(allAudioURLs: any) {
+  if (allAudioURLs === null) {
+    return <tr></tr>
+  }
+  // const asType = allAudioURLs.map((item: any): any => {
+  //   debugger;
+  //   return {
+  //     sound_type: item.sound_type,
+  //     name: item.name,
+  //     mood: item.mood
+  //   };
+  // })
+
+  const soundTypes: Array<String> = [];
+  allAudioURLs.forEach((item: any) => {
+    if (soundTypes.includes(item.mood)) {
+      soundTypes.push(item.mood);
+    }
+  })
+
+  const asType = soundTypes.map((mood: String) => {
+    return allAudioURLs.filter((url: any) => {
+      return (url.mood === mood);
+    })
+  })
+  debugger;
+  return <>{asType.map((audioItem: any): any => {
+      return <tr>
+          {eachTR(audioItem)}
+        </tr>
+  })}</>
+}
+const soundsTableHeader = () =>
     <thead>
         <tr>
             <th>Sound type</th>
@@ -85,21 +128,50 @@ const tableHeader = () =>
         </tr>
     </thead>
 
+const soundsTableBody = (allAudioURLs: any) =>
+  <tbody>
+    {soundsByType(allAudioURLs)}
+  </tbody>
+
+
+
+class SoundsOfType extends React.Component<AppState, AppProps> {
+  state: AppState = defaultState;
+  randomAnySound = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): any => {
+    if (this.state.allAudioURLs === null) {
+      return;
+    }
+    event.preventDefault();
+    // randomSound().play();
+    const sound: any = randomSoundFromArray(this.state.allAudioURLs);
+    this.setState({currentSound: sound});
+  }
+
+  render() {
+    return (
+      <Button onClick={this.randomAnySound}>Random sound</Button>
+    )
+  }
+}
 
 
 class _App extends React.Component<AppProps, AppState> {
   state: AppState = defaultState;
 
-
-
   randomGoodSound = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): any => {
     event.preventDefault();
+    if (this.state.allAudioURLs === null) {
+      return;
+    }
     // randomSound().play();
     const sound: any = randomSoundFromArray(goodSounds(this.state.allAudioURLs))
     this.setState({currentSound: sound});
   }
 
   randomBadSound = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): any => {
+    if (this.state.allAudioURLs === null) {
+      return;
+    }
     event.preventDefault();
     // randomSound().play();
     const sound: any = randomSoundFromArray(badSounds(this.state.allAudioURLs))
@@ -107,6 +179,9 @@ class _App extends React.Component<AppProps, AppState> {
   }
 
   randomAnySound = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): any => {
+    if (this.state.allAudioURLs === null) {
+      return;
+    }
     event.preventDefault();
     // randomSound().play();
     const sound: any = randomSoundFromArray(this.state.allAudioURLs);
@@ -116,37 +191,22 @@ class _App extends React.Component<AppProps, AppState> {
 
   async componentDidMount() {
     const allAudioURLs: any = await content()
+    console.log(allAudioURLs);
     this.setState({allAudioURLs: allAudioURLs});
     // debugger;
-    console.log(allAudioURLs);
     console.log(goodSounds(allAudioURLs));
     // const sound: any = randomSoundFromArray(goodSounds(this.state.allAudioURLs))
     // this.setState({currentSound: sound});
+    return;
   }
 
-  soundsByType() {
-    if (this.state.allAudioURLs === null) {
-      return <p></p>
-    }
-    const asType = this.state.allAudioURLs.map((item: any): any => {
-      return {
-        soundType: item.soundType,
-        item: item
-      };
-    })
-  return <></>
-  }
 
-  tableBody = () =>
-    <tbody>
-      {this.soundsByType()}
 
-    </tbody>
 
   table = () =>
     <Table striped bordered hover>
-      {tableHeader()}
-      {this.tableBody()}
+      {soundsTableHeader()}
+      {soundsTableBody(this.state.allAudioURLs)}
     </Table>
 
   body() {
