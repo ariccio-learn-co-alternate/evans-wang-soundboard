@@ -3,6 +3,9 @@ import './App.css';
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 import { jsxAttribute } from '@babel/types';
+import {connect} from 'react-redux';
+
+import {setSound} from './actions';
 
 const GET_PARAMS: RequestInit =  {
   method: 'GET',
@@ -22,21 +25,22 @@ async function content()  {
   //   })
   // debugger;
   // return `api/sounds/${parsed.sounds[0].id}`;
-  return parsed.sounds
+  return parsed.sounds;
 }
 
 interface AppProps {
-
-}
-
-interface AppState {
-  allAudioURLs?: any;
   currentSound?: any;
+  setSound: any;
 }
 
-const defaultState: AppState = {
-  allAudioURLs : null,
-  currentSound: null
+export interface AppState {
+  allAudioURLs?: any;
+  
+}
+
+export const defaultState: AppState = {
+  allAudioURLs : null
+  // currentSound: null
 }
 
 const audioItem = (item?: any) =>
@@ -75,6 +79,7 @@ function randomSoundFromArray(sounds: Array<any>): any {
   if (sound === null) {
       throw new Error("Sound not valid");
   }
+  // debugger;
   console.log(`returning random sound: ${sound.id}`)
   return sound;
 }
@@ -89,20 +94,20 @@ const eachTR = (anAudioItem: any): JSX.Element =>
     </td>
   </>
 function soundsByType(allAudioURLs: any) {
-  if (allAudioURLs === null) {
+  if ((allAudioURLs === null) || (allAudioURLs === undefined) || (allAudioURLs.length === 0)) {
     return <tr></tr>
   }
-  const asType = allAudioURLs.forEach((item: any): any => {
-    debugger;
+  const asType = allAudioURLs.map((item: any): any => {
+    // debugger;
     return {
       sound_type: item.sound_type,
       name: item.name,
       mood: item.mood
     };
   })
-
+  // debugger;
   return <>{asType.map((audioItem: any): any => {
-      debugger;
+      // debugger;
       return <tr>
           {eachTR(audioItem)}
         </tr>
@@ -123,7 +128,7 @@ const soundsTableBody = (allAudioURLs: any) =>
 
 
 
-class SoundsOfType extends React.Component<AppState, AppProps> {
+class SoundsOfType extends React.Component<AppProps, AppState> {
   state: AppState = defaultState;
   randomAnySound = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): any => {
     if (this.state.allAudioURLs === null) {
@@ -132,7 +137,8 @@ class SoundsOfType extends React.Component<AppState, AppProps> {
     event.preventDefault();
     // randomSound().play();
     const sound: any = randomSoundFromArray(this.state.allAudioURLs);
-    this.setState({currentSound: sound});
+    // debugger;
+    this.props.setSound(sound);
   }
 
   render() {
@@ -153,7 +159,7 @@ class _App extends React.Component<AppProps, AppState> {
     }
     // randomSound().play();
     const sound: any = randomSoundFromArray(goodSounds(this.state.allAudioURLs))
-    this.setState({currentSound: sound});
+    this.props.setSound(sound);
   }
 
   randomBadSound = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): any => {
@@ -163,7 +169,7 @@ class _App extends React.Component<AppProps, AppState> {
     event.preventDefault();
     // randomSound().play();
     const sound: any = randomSoundFromArray(badSounds(this.state.allAudioURLs))
-    this.setState({currentSound: sound});
+    this.props.setSound(sound);
   }
 
   randomAnySound = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): any => {
@@ -173,7 +179,7 @@ class _App extends React.Component<AppProps, AppState> {
     event.preventDefault();
     // randomSound().play();
     const sound: any = randomSoundFromArray(this.state.allAudioURLs);
-    this.setState({currentSound: sound});
+    this.props.setSound(sound);
   }
 
 
@@ -198,13 +204,14 @@ class _App extends React.Component<AppProps, AppState> {
     </Table>
 
   body() {
+    debugger;
     return (
       <>
         <p><Button onClick={this.randomAnySound}>Random sound</Button></p>
         <p><Button onClick={this.randomGoodSound}>Random happy sound</Button></p>
         <p><Button onClick={this.randomBadSound}>Random bad sound</Button></p>
         {/* <audio src={this.state.allAudioURLs ? `http://localhost:3000/${this.state.allAudioURLs}` : ""} id="farts" controls/> */}
-        { this.state.currentSound ? audioItemAutoplay(this.state.currentSound) : null}
+        { this.props.currentSound ? audioItemAutoplay(this.props.currentSound) : null}
         {/* {this.state.allAudioURLs ? audioItems(this.state.allAudioURLs) : null} */}
         {this.table()}
       </>
@@ -224,4 +231,11 @@ class _App extends React.Component<AppProps, AppState> {
   }
 }
 
-export const App = _App;
+const mapStateToProps = (state: any) => {
+  return {
+    currentSound: state.currentSound
+  }
+}
+
+
+export const App = connect(mapStateToProps, {setSound})(_App);
