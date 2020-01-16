@@ -92,29 +92,17 @@ function soundsByType(allAudioURLs: any) {
   if (allAudioURLs === null) {
     return <tr></tr>
   }
-  // const asType = allAudioURLs.map((item: any): any => {
-  //   debugger;
-  //   return {
-  //     sound_type: item.sound_type,
-  //     name: item.name,
-  //     mood: item.mood
-  //   };
-  // })
-
-  const soundTypes: Array<String> = [];
-  allAudioURLs.forEach((item: any) => {
-    if (soundTypes.includes(item.mood)) {
-      soundTypes.push(item.mood);
-    }
+  const asType = allAudioURLs.forEach((item: any): any => {
+    debugger;
+    return {
+      sound_type: item.sound_type,
+      name: item.name,
+      mood: item.mood
+    };
   })
 
-  const asType = soundTypes.map((mood: String) => {
-    return allAudioURLs.filter((url: any) => {
-      return (url.mood === mood);
-    })
-  })
-  debugger;
   return <>{asType.map((audioItem: any): any => {
+      debugger;
       return <tr>
           {eachTR(audioItem)}
         </tr>
